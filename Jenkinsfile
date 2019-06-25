@@ -14,7 +14,7 @@ node {
     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.191:6443']) {
       
     	//sh 'kubectl create ns development'
-    	sh(returnStdout: true, script: '''#!/bin/bash
+    	bash(returnStdout: true, script: '''#!/bin/bash
             if [ `kubectl get ns|grep development|wc -l` -lt 1 ];then
                kubectl create ns development
                DEPLOY="HELLO"
