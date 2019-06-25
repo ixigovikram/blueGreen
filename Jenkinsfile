@@ -10,6 +10,7 @@ node {
   }
 
   stage('Get Current Deployment') {
+     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.191:6443']) {
         //sh 'Check existing deployment -- BLUE, GREEN or first time deployment'
         sh(returnStdout: true, script: '''#!/bin/bash
             if [ `kubectl get deploy -n development|grep -c nodejs-deployment` -lt 1 ];then
@@ -27,8 +28,9 @@ node {
         sh "echo $DEPLOY"
         sh "sed -i 's|COLOR|${DEPLOY}|g' deploy/deployment.yaml"
   }
+}
   stage('Deploy latest version') {
-     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.39:6443']) { 
+     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.191:6443']) { 
     	sh 'kubectl create cm nodejs-app --from-file=src/ --namespace=development -o=yaml --dry-run > deploy/cm.yaml'
      	sh 'kubectl apply -f deploy/deployment.yaml --namespace=development'
      	sh 'kubectl apply -f deploy/cm.yaml --namespace=development'
@@ -42,7 +44,7 @@ node {
     }
   }
   stage('Patch Service to latest version') {
-     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.39:6443']) {
+     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.191:6443']) {
      echo "Creating k8s resources..."
      sleep 180
      sh "echo $DEPLOY"
