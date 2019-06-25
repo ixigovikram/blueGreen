@@ -22,7 +22,7 @@ node {
 	    else
 	       echo "Already Created."
                DEPLOY="HI"
-	       echo $DEPLOY
+	       echo {"$DEPLOY"}
             fi
         '''.stripIndent())
     }
