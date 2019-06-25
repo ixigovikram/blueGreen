@@ -17,6 +17,8 @@ node {
     	sh(returnStdout: true, script: '''#!/bin/bash
             if [ `kubectl get ns|grep development|wc -l` -lt 1 ];then
                kubectl create ns development
+               DEPLOY="HELLO"
+	       echo "${DEPLOY}"
 	    else
 	       echo "Already Created."
             fi
