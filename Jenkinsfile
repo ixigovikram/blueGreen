@@ -21,6 +21,8 @@ node {
 	       echo "${DEPLOY}"
 	    else
 	       echo "Already Created."
+               DEPLOY="HI"
+	       echo "${DEPLOY}"
             fi
         '''.stripIndent())
     }
@@ -31,13 +33,13 @@ node {
         //sh 'Check existing deployment -- BLUE, GREEN or first time deployment'
         sh(returnStdout: true, script: '''#!/bin/bash
             if [ `kubectl get deploy -n development|grep -c nodejs-deployment` -lt 1 ];then
-                  DEPLOY=GREEN
+                  DEPLOY="GREEN"
             else
                CURR_DEPLOY=`kubectl get deploy -n development|grep nodejs-deployment|awk '{print $1}'|awk -F'-' '{print $NF}'`
                 if [ $CURR_DEPLOY == "GREEN" ]; then
-                        DEPLOY=BLUE
+                        DEPLOY="BLUE"
                   else
-                        DEPLOY=GREEN
+                        DEPLOY="GREEN"
                 fi
             fi
         '''.stripIndent())
