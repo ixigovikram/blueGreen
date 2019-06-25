@@ -41,4 +41,29 @@ node {
         '''.stripIndent())
     }
   }
+  stage('Patch Service to latest version') {
+     withKubeConfig([credentialsId: 'jenkins-deployer-credentials', serverUrl: 'https://10.0.5.39:6443']) {
+     echo "Creating k8s resources..."
+     sleep 180
+     sh "echo $DEPLOY"
+     DESIRED= sh (
+              script: "kubectl get deploy -n development | grep nodejs-deployment-${DEPLOY} | awk '{print \$2}' | grep -v DESIRED",
+              returnStdout: true
+         ).trim()
+     CURRENT= sh (
+              script: "kubectl get deploy -n development | grep nodejs-deployment-${DEPLOY} | awk '{print \$3}' | grep -v CURRENT",
+              returnStdout: true
+         ).trim()
+
+	sh "Desired pods -- $DESIRED"
+	sh "Current pods -- $CURRENT"
+        //sh 'Patch service if DESIRED pods eq CURRENT pods'
+        sh(returnStdout: true, script: '''#!/bin/bash
+            if [ $DESIRED -eq $CURRENT ];then
+                 sh """kubectl patch svc nodejs-service -n development -p '{\"spec\":{\"selector\":{\"app\":\"nodejs\",\"lable\":\"${DEPLOY}\"}}}'"""
+            fi
+        '''.stripIndent())
+
+    }
+  }
 }
